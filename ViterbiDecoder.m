@@ -104,7 +104,7 @@ end
 function returnValue = getValues(position,HD)
   switch (position)
     case 1
-      if(HD='HARD')
+      if(HD=='HARD')
         returnValue=[0 0];
       else
         returnValue=[1 1];
@@ -208,13 +208,11 @@ function returnValue = viterbiDecoderFiveSeven(source,HD='HARD')
   possibleSteps=[1 2;3 4;1 2;3 4];
   extendedSource=[0 0 source 0 0];
   outputValue=[0 0 1 1;0 1 1 0;1 1 0 0;1 0 0 1];
-  if (HD!='HARD')
-    outputValue=mapping(outputValue);
-    source=mapping(extendedSource); 
-  endif
-
   returnValue=zeros(len+2);
   extendedSource=[0 0 source 0 0 0 0];
+  if (HD!='HARD')
+    outputValue=mapping(outputValue);
+  endif
   returnValueMatrix=ones(4,len+3)*9999;
   currentSteps=possibleSteps(1,:);
   returnValueMatrix(1,1)=0;
@@ -245,9 +243,9 @@ end
 infoBits = round(rand(1,10000));
 %infoBits=[1 1 1 0 1 0 0 1]
 %% see comment at convolutinalEncoder
-convolutionalEncodedSignal=convolutionalEncoder(infoBits);
+convolutionalEncodedSignal=mapping(convolutionalEncoder(infoBits));
 %y=[1 1 0 0 1 0 0 1 0 0]
-viterbiDecodedSignal=viterbiDecoderFiveSeven(convolutionalEncodedSignal);
+viterbiDecodedSignal=viterbiDecoderFiveSeven(convolutionalEncodedSignal,'SOFT');
 BER = ber(infoBits,viterbiDecodedSignal)
 
 
