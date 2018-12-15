@@ -19,6 +19,7 @@ function returnValue = SD(y1,x1,y2,x2)
   returnValue=(y1-x1)^2+(y2-x2)^2;
 end
 
+%This encoder is from lab3 and does not always generate a "correct" signal for the viterbi decoder
 function returnValue = convolutionalEncoder(source)
   extendedSource = [0 0 source];
   returnValue = zeros (1, length(source)*2);
@@ -182,11 +183,11 @@ function [returnValue,stepMatrix,diff] = mostLiklyStep(stepMatrix,returnValueMat
     endif  
 end
 
-function returnValue = mostLiklySteps(returnValueMatrix,possibleSteps)
-  returnValues=zeros(1,5);
+function returnValue = mostLiklySteps(len,returnValueMatrix,possibleSteps)
+  returnValues=zeros(1,len-3);
   len = length(returnValueMatrix);
-  stepMatrix=ones(4,7)*9999;
-  for i=1:1:7
+  stepMatrix=ones(4,len-2)*9999;
+  for i=1:1:len-2
     [returnValues(i),stepMatrixReturn]=mostLiklyStep(stepMatrix,returnValueMatrix,i,possibleSteps);
     stepMatrix=stepMatrixReturn;
 end 
@@ -194,7 +195,7 @@ returnValue=returnValues;
 end
 
 function returnValue = viterbiDecoderFiveSeven(source,HD='HARD')
-  
+  len=length(source)/2;
   possibleSteps=[1 2;3 4;1 2;3 4];
   extendedSource=[0 0 source 0 0];
   outputValue=[0 0 1 1;0 1 1 0;0 1 1 0;0 0 1 1];
@@ -203,14 +204,14 @@ function returnValue = viterbiDecoderFiveSeven(source,HD='HARD')
     source=mapping(extendedSource); 
   endif
 
-  returnValue=zeros(7);
+  returnValue=zeros(len+2);
   extendedSource=[0 0 source 0 0 0 0];
-  returnValueMatrix=ones(4,8)*9999;
+  returnValueMatrix=ones(4,len+3)*9999
   currentSteps=possibleSteps(1,:);
   returnValueMatrix(1,1)=0;
   currentPosition=1;
   currentColumnPosition=1;
-  for k=1:5
+  for k=1:len
     steps=find(returnValueMatrix(:,currentColumnPosition)<9999);
     currentPosition=currentPosition+2;
     currentColumnPosition=currentColumnPosition+1;
@@ -228,15 +229,16 @@ function returnValue = viterbiDecoderFiveSeven(source,HD='HARD')
         returnValueMatrix=viterbiLikelyhood(returnValueMatrix,getValues(i,HD),extendedSource,currentColumnPosition,currentPosition,outputValue,possibleSteps,true,HD);
       end
   end
-  returnValue = mostLiklySteps(returnValueMatrix,possibleSteps)(2:6); 
+  returnValueMatrix
+  returnValue = mostLiklySteps(len,returnValueMatrix,possibleSteps)(2:len+1); 
 end
 
 
-%source=[1 1,0 0,1 0,0 1,0 0,0 0];
-%source=[1 1,1 0,1 0,0 1,0 0,0 0];
-infoBits=[1 0 1 0 0]
-convolutionalEncodedSignal=convolutionalEncoder(infoBits)
-viterbiDecodedSignal=viterbiDecoderFiveSeven(convolutionalEncodedSignal)
+%infoBits=[1 1 1 0 1 0 0 1]
+%% see comment at convolutinalEncoder
+%convolutionalEncodedSignal=convolutionalEncoder(infoBits)
+y=[1 1 0 0 1 0 0 1 0 0]
+viterbiDecodedSignal=viterbiDecoderFiveSeven(y)
 
 
 
