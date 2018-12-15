@@ -28,7 +28,6 @@ end
 returnValue = sum(sourceA ~= sourceB);
 end
 
-%This encoder is from lab3 and does not always generate a "correct" signal for the viterbi decoder
 function returnValue = convolutionalEncoder(source)
   extendedSource = [0 0 source];
   returnValue = zeros (1, length(source)*2);
@@ -241,10 +240,7 @@ end
 
 
 infoBits = round(rand(1,10000));
-%infoBits=[1 1 1 0 1 0 0 1]
-%% see comment at convolutinalEncoder
 convolutionalEncodedSignal=mapping(convolutionalEncoder(infoBits));
-%y=[1 1 0 0 1 0 0 1 0 0]
 viterbiDecodedSignal=viterbiDecoderFiveSeven(convolutionalEncodedSignal,'SOFT');
 BER = ber(infoBits,viterbiDecodedSignal)
 
